@@ -8,15 +8,12 @@ class View
 protected:
   
 public:  
-  View() {
-    
+  View() 
+  {    
   }
   
   /** The Active View */
   static View *g_pActiveView;
-  
-  /** once in application lifetime initialization */  
-  static void setup();
   
 
   /** analog keyboard APIs where vk is one of VK_xxx */
@@ -24,7 +21,7 @@ public:
   bool onKeyAutoRepeat(uint8_t vk);
   bool onLongKeyDown(uint8_t vk);
   bool onKeyUp(uint8_t vk);
-  bool onKeyInactive();
+  bool onKeysInactive();
 
   
   /** to be called from the main loop on the active view.  Do nothing by default. return TRUE to update the display.  */

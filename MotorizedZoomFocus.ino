@@ -27,10 +27,6 @@ extern "C"{
  * Globals: reading battery voltage on A0 (through divider offcourse)
  */
 BatteryMonitor g_batteryMonitor(A0);
-/** 
- * Globals: simple analog keypad is connected to pins A1 and A2 so that,e.g. up and left could be pressed simultaneously
- */
-KeypadDuo g_keyPad(A1, A2);
 
 const uint8_t pinZoom1 = 2;
 const uint8_t pinZoom2 = 3;

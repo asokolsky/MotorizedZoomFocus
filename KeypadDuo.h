@@ -6,7 +6,7 @@
 /* Such a keyboard is just a voltage divider connected to a single analog inpup pin.        */
 /* Provides for debounce which is important on fast muCPUs, e.g. Teensy                     */
 /*                                                                                          */
-/* To ensure that two keys can be used siultaneously, two analog inputs are used.           */
+/* To ensure that two keys can be used simultaneously, two analog inputs are used.          */
 /*                                                                                          */
 /* Alex Sokolsky, May 2015                                                                  */
 /*                                                                                          */
@@ -15,12 +15,12 @@
 //#include <Arduino.h>
 
 /** define some values for button (key) scan codes */
-const uint8_t VK_NONE = 0;
+const uint8_t VK_NONE  = 0;
 const uint8_t VK_RIGHT = 1;
-const uint8_t VK_LEFT = 2;
-const uint8_t VK_UP = 4;
-const uint8_t VK_DOWN = 8;
-const uint8_t VK_SEL = 16;
+const uint8_t VK_LEFT  = 2;
+const uint8_t VK_UP    = 4;
+const uint8_t VK_DOWN  = 8;
+const uint8_t VK_SEL   = 16;
 /** Custom context specific soft buttons */
 const uint8_t VK_SOFTA = 32;
 const uint8_t VK_SOFTB = 64;
@@ -36,7 +36,7 @@ class KeypadChannel
   static const int s_iLongKeyDelay = 2000;
 
   /** inactivity timeout in milliseconds */
-  static const unsigned long s_ulInactivityDelay = 1000*90;
+  static const unsigned long s_ulInactivityDelay = 90000;
 
 public:
   KeypadChannel(){}
@@ -48,8 +48,6 @@ public:
   unsigned long m_ulToFireAutoRepeat = 0;
   /** when bouncing subsides */
   unsigned long m_ulBounceSubsided = 0;
-  /** when inactivity timeout will happen */
-  unsigned long m_ulToFireInactivity = 0;
   /** an array of scan codes to generate when one of keys is pressed */
   uint8_t m_vk[4];
 
@@ -73,6 +71,10 @@ class KeypadDuo
   KeypadChannel m_ch[2];
 
 public:
+  /** when inactivity timeout will happen */
+  unsigned long m_ulToFireInactivity = 0;
+
+  
   /** keypad is connected to this analog input pin */
   KeypadDuo(uint8_t bPin1, uint8_t bPin2);
 

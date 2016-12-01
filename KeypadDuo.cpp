@@ -4,6 +4,12 @@
 //#include "Trace.h"
 //#include "Views.h"
 
+/** 
+ * Globals: simple analog keypad is connected to pins A1 and A2 so that,e.g. up and left could be pressed simultaneously
+ */
+KeypadDuo g_keyPad(A1, A2);
+
+
 #ifndef  NODEBUG
 /** debug/trace helper */
 static const char *getKeyName(uint8_t vk) {
@@ -35,8 +41,31 @@ uint8_t KeypadChannel::getKey()
   DEBUG_PRINTLN("");
 */
 
+  if(sizeof(m_vk)/sizeof(m_vk[0]) == 4)
+  {
+    // 1st option for speed reasons since it will be the most likely result
+    if(adc_key_in > 950) {
+      //DEBUG_PRINTLN("Keypad::getKey() => VK_NONE");
+      return VK_NONE;
+    }
+    if(adc_key_in < 76) {
+      //DEBUG_PRINTLN("Keypad::getKey() => m_vk[0]");
+      return m_vk[0];  
+    }  
+    if(adc_key_in < 525) {
+      //DEBUG_PRINTLN("Keypad::getKey() => m_vk[1]");
+      return m_vk[1];  
+    }
+    if(adc_key_in < 675) {
+      //DEBUG_PRINTLN("Keypad::getKey() => m_vk[2]");
+      return m_vk[2];  
+    }
+    //DEBUG_PRINTLN("Keypad::getKey() => m_vk[3]");
+    return m_vk[3];  
+  }
+  
   // 1st option for speed reasons since it will be the most likely result
-  if(adc_key_in > 950) {
+  if(adc_key_in > 900) {
     //DEBUG_PRINTLN("Keypad::getKey() => VK_NONE");
     return VK_NONE;
   }
@@ -48,12 +77,8 @@ uint8_t KeypadChannel::getKey()
     //DEBUG_PRINTLN("Keypad::getKey() => m_vk[1]");
     return m_vk[1];  
   }
-  if(adc_key_in < 675) {
-    //DEBUG_PRINTLN("Keypad::getKey() => m_vk[2]");
-    return m_vk[2];  
-  }
-  //DEBUG_PRINTLN("Keypad::getKey() => m_vk[3]");
-  return m_vk[3];  
+  //DEBUG_PRINTLN("Keypad::getKey() => m_vk[2]");
+  return m_vk[2];  
 }
 
 bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
@@ -68,10 +93,10 @@ bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
   {
     if(vk == VK_NONE)
     {
-      if(ulNow < m_ulToFireInactivity)
+      if(ulNow < g_keyPad.m_ulToFireInactivity)
         return false;
-      m_ulToFireInactivity = 0;
-      return View::g_pActiveView->onKeyInactive();
+      g_keyPad.m_ulToFireInactivity = 0;
+      return View::g_pActiveView->onKeysInactive();
     }
     // fire auto repeat logic here
     if((m_ulToFireAutoRepeat == 0) || (ulNow < m_ulToFireAutoRepeat))
@@ -101,7 +126,7 @@ bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
     m_ulToFireLongKey = ulNow + s_iLongKeyDelay;
     m_ulToFireAutoRepeat = ulNow + s_iAutoRepeatDelay;
     m_ulBounceSubsided = 0;
-    m_ulToFireInactivity = ulNow + s_ulInactivityDelay;
+    g_keyPad.m_ulToFireInactivity = ulNow + s_ulInactivityDelay;
     DEBUG_PRINT("onKeyDown vk="); DEBUG_PRINT(getKeyName(vk)); DEBUG_PRINT(" m_bOldKey="); DEBUG_PRINT(getKeyName(m_bOldKey)); DEBUG_PRINTLN("");
     bRes = View::g_pActiveView->onKeyDown(vk);
   }
@@ -113,7 +138,7 @@ bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
   else
   {
     m_ulToFireAutoRepeat = m_ulToFireLongKey = m_ulBounceSubsided = 0;
-    m_ulToFireInactivity = ulNow + s_ulInactivityDelay;
+    g_keyPad.m_ulToFireInactivity = ulNow + s_ulInactivityDelay;
     DEBUG_PRINT("onKeyUp vk="); DEBUG_PRINT(getKeyName(vk)); DEBUG_PRINT(" m_bOldKey="); DEBUG_PRINT(getKeyName(m_bOldKey)); DEBUG_PRINTLN("");
     bRes = View::g_pActiveView->onKeyUp(m_bOldKey);
   }

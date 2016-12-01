@@ -27,4 +27,12 @@ typedef signed char schar_t;
 #include "Views.h"
 //#include "Stepper.h"
 
+/**
+ * Steppers constants and globals
+ */
+const unsigned int iZoomSpeed = 20;
+const unsigned int iFocusSpeed = 20;
+
+extern AccelStepper g_stepperZoom;
+extern AccelStepper g_stepperFocus;
 
