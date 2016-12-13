@@ -41,6 +41,7 @@ class KeypadChannel
 public:
   KeypadChannel(){}
 
+  /** Analog pin from which we are reading */
   uint8_t m_bPin = 0;
   /** when to fire long key */
   unsigned long m_ulToFireLongKey = 0;
@@ -48,8 +49,14 @@ public:
   unsigned long m_ulToFireAutoRepeat = 0;
   /** when bouncing subsides */
   unsigned long m_ulBounceSubsided = 0;
-  /** an array of scan codes to generate when one of keys is pressed */
-  uint8_t m_vk[4];
+  /** 
+   *  an array of scan codes to generate when one of keys is pressed 
+   *  e.g. [Up, Down]
+   *  e.g. [Right, Left, Sel]
+   *  or [Right, Left, Sel, A] [Up, Down, None, B]
+   */
+  uint8_t *m_vk;
+  uint8_t m_uKeys = 0;
 
   /** get one of VK_xxx */
   uint8_t getKey();
@@ -57,7 +64,15 @@ public:
   uint8_t m_bOldKey = VK_NONE;
 
   bool getAndDispatchKey(unsigned long ulNow);
-  
+
+protected:
+  /** get one of VK_xxx */
+  uint8_t getKey2(int16_t iReading);
+  /** get one of VK_xxx */
+  uint8_t getKey3(int16_t iReading);
+  /** get one of VK_xxx */
+  uint8_t getKey4(int16_t iReading);
+
 };
 
 /**
@@ -68,6 +83,7 @@ public:
  */
 class KeypadDuo
 {
+  /** to ensure that multiple keys can be read at the same time... */
   KeypadChannel m_ch[2];
 
 public:

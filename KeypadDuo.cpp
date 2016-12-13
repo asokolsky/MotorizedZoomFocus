@@ -28,11 +28,80 @@ static const char *getKeyName(uint8_t vk) {
 #endif
 
 /**
+ *  KeypadChannel class implementation 
+ */
+/**
+ * get one of VK_xxx 
+ * Values are 0, 512
+ */
+uint8_t KeypadChannel::getKey2(int16_t iReading)
+{
+  // 1st option for speed reasons since it will be the most likely result
+  if(iReading > 760) { // 512 + 512/2
+    //DEBUG_PRINTLN("Keypad::getKey2() => VK_NONE");
+    return VK_NONE;
+  }
+  if(iReading < 256) { // 512/2
+    //DEBUG_PRINTLN("Keypad::getKey2() => m_vk[0]");
+    return m_vk[0];  
+  }  
+  //DEBUG_PRINTLN("Keypad::getKey2() => m_vk[1]");
+  return m_vk[1];
+}
+
+/** 
+ * get one of VK_xxx 
+ * Values are 0, 341, 682
+ */
+uint8_t KeypadChannel::getKey3(int16_t iReading)
+{
+  // 1st option for speed reasons since it will be the most likely result
+  if(iReading > 852) { // 682 + 341/2
+    //DEBUG_PRINTLN("Keypad::getKey3() => VK_NONE");
+    return VK_NONE;
+  }
+  if(iReading < 170) { // 341/2
+    //DEBUG_PRINTLN("Keypad::getKey3() => m_vk[0]");
+    return m_vk[0];  
+  }  
+  if(iReading < 511) { // 341 + 341/2
+    //DEBUG_PRINTLN("Keypad::getKey3() => m_vk[1]");
+    return m_vk[1];  
+  }
+  //DEBUG_PRINTLN("Keypad::getKey3() => m_vk[2]");
+  return m_vk[2];  
+}
+/** get one of VK_xxx */
+uint8_t KeypadChannel::getKey4(int16_t iReading)
+{
+  // 1st option for speed reasons since it will be the most likely result
+  if(iReading > 950) {
+    //DEBUG_PRINTLN("Keypad::getKey4() => VK_NONE");
+    return VK_NONE;
+  }
+  if(iReading < 76) {
+    //DEBUG_PRINTLN("Keypad::getKey4() => m_vk[0]");
+    return m_vk[0];  
+  }  
+  if(iReading < 525) {
+    //DEBUG_PRINTLN("Keypad::getKey4() => m_vk[1]");
+    return m_vk[1];  
+  }
+  if(iReading < 675) {
+    //DEBUG_PRINTLN("Keypad::getKey4() => m_vk[2]");
+    return m_vk[2];  
+  }
+  //DEBUG_PRINTLN("Keypad::getKey4() => m_vk[3]");
+  return m_vk[3];  
+}
+
+/**
  * get one of VK_xxx
  */
 uint8_t KeypadChannel::getKey()
 {
-  int adc_key_in = analogRead(m_bPin);      // read the value from the sensor 
+  //analogRead(m_bPin);                     // switch the channel to m_bPin and hold for 104µs
+  int adc_key_in = analogRead(m_bPin);    // read the value from the sensor 
 /*
   DEBUG_PRINT("analogRead(m_bPin=");
   DEBUG_PRINTDEC(m_bPin);
@@ -40,45 +109,23 @@ uint8_t KeypadChannel::getKey()
   DEBUG_PRINTDEC(adc_key_in);
   DEBUG_PRINTLN("");
 */
-
-  if(sizeof(m_vk)/sizeof(m_vk[0]) == 4)
-  {
-    // 1st option for speed reasons since it will be the most likely result
-    if(adc_key_in > 950) {
-      //DEBUG_PRINTLN("Keypad::getKey() => VK_NONE");
-      return VK_NONE;
-    }
-    if(adc_key_in < 76) {
-      //DEBUG_PRINTLN("Keypad::getKey() => m_vk[0]");
-      return m_vk[0];  
-    }  
-    if(adc_key_in < 525) {
-      //DEBUG_PRINTLN("Keypad::getKey() => m_vk[1]");
-      return m_vk[1];  
-    }
-    if(adc_key_in < 675) {
-      //DEBUG_PRINTLN("Keypad::getKey() => m_vk[2]");
-      return m_vk[2];  
-    }
-    //DEBUG_PRINTLN("Keypad::getKey() => m_vk[3]");
-    return m_vk[3];  
-  }
-  
   // 1st option for speed reasons since it will be the most likely result
-  if(adc_key_in > 900) {
+  if(adc_key_in > 950) {
     //DEBUG_PRINTLN("Keypad::getKey() => VK_NONE");
     return VK_NONE;
   }
-  if(adc_key_in < 76) {
-    //DEBUG_PRINTLN("Keypad::getKey() => m_vk[0]");
-    return m_vk[0];  
-  }  
-  if(adc_key_in < 525) {
-    //DEBUG_PRINTLN("Keypad::getKey() => m_vk[1]");
-    return m_vk[1];  
+  switch(m_uKeys)
+  {
+    case 2:
+      return getKey4(adc_key_in);
+    case 3:
+      return getKey4(adc_key_in);
+    case 4:
+      return getKey4(adc_key_in);
+    default:
+      DEBUG_PRINTLN("KeypadChannel::getKey() wrong m_uKeys");
   }
-  //DEBUG_PRINTLN("Keypad::getKey() => m_vk[2]");
-  return m_vk[2];  
+  return VK_NONE;
 }
 
 bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
@@ -146,20 +193,21 @@ bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
   return bRes;
 }
 
-
+/**
+ *  KeypadDuo class implementation 
+ */
 KeypadDuo::KeypadDuo(uint8_t bPin1, uint8_t bPin2)
 {
   m_ch[0].m_bPin = bPin1;
-  m_ch[0].m_vk[0] = VK_RIGHT;
-  m_ch[0].m_vk[1] = VK_LEFT;
-  m_ch[0].m_vk[2] = VK_SEL;
-  m_ch[0].m_vk[3] = VK_SOFTA;
+  static uint8_t Keys1[] = {VK_RIGHT, VK_LEFT, VK_SEL /*, VK_SOFTA */};
+  m_ch[0].m_vk = Keys1;
+  m_ch[0].m_uKeys = sizeof(Keys1)/sizeof(Keys1[0]);
+
+  static uint8_t Keys2[] = {VK_UP, VK_DOWN /*, VK_SOFTB*/};
   
   m_ch[1].m_bPin = bPin2;
-  m_ch[1].m_vk[0] = VK_UP;
-  m_ch[1].m_vk[1] = VK_DOWN;
-  m_ch[1].m_vk[2] = VK_NONE;
-  m_ch[1].m_vk[3] = VK_SOFTB;
+  m_ch[1].m_vk = Keys2;
+  m_ch[1].m_uKeys = sizeof(Keys2)/sizeof(Keys2[0]);
 }
 
 bool KeypadDuo::getAndDispatchKey(unsigned long now)
@@ -169,3 +217,5 @@ bool KeypadDuo::getAndDispatchKey(unsigned long now)
     i = 0;
   return m_ch[i++].getAndDispatchKey(now);
 }
+
+
