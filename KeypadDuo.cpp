@@ -7,7 +7,11 @@
 /** 
  * Globals: simple analog keypad is connected to pins A1 and A2 so that,e.g. up and left could be pressed simultaneously
  */
-KeypadDuo g_keyPad(A1, A2);
+static uint8_t Keys1[] = {VK_UP, VK_DOWN, VK_SEL /*, VK_SOFTB*/};
+static uint8_t Keys2[] = {VK_RIGHT, VK_LEFT /*, VK_SOFTA */};
+
+KeypadDuo g_keyPad(A1, Keys1, (sizeof(Keys1)/sizeof(Keys1[0])), 
+                   A2, Keys2, (sizeof(Keys2)/sizeof(Keys2[0])));
 
 
 #ifndef  NODEBUG
@@ -142,8 +146,7 @@ bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
     {
       if(ulNow < g_keyPad.m_ulToFireInactivity)
         return false;
-      g_keyPad.m_ulToFireInactivity = 0;
-      return View::g_pActiveView->onKeysInactive();
+      return g_keyPad.onUserInActivity(ulNow);
     }
     // fire auto repeat logic here
     if((m_ulToFireAutoRepeat == 0) || (ulNow < m_ulToFireAutoRepeat))
@@ -153,7 +156,7 @@ bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
     else
     {
       m_ulToFireAutoRepeat = ulNow + s_iAutoRepeatDelay;
-      DEBUG_PRINT("onKeyAutoRepeat vk="); DEBUG_PRINT(getKeyName(vk)); DEBUG_PRINTLN("");
+      //DEBUG_PRINT("onKeyAutoRepeat vk="); DEBUG_PRINT(getKeyName(vk)); DEBUG_PRINTLN("");
       bRes = View::g_pActiveView->onKeyAutoRepeat(vk);      
     }      
     // fire long key logic here
@@ -173,9 +176,9 @@ bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
     m_ulToFireLongKey = ulNow + s_iLongKeyDelay;
     m_ulToFireAutoRepeat = ulNow + s_iAutoRepeatDelay;
     m_ulBounceSubsided = 0;
-    g_keyPad.m_ulToFireInactivity = ulNow + s_ulInactivityDelay;
     DEBUG_PRINT("onKeyDown vk="); DEBUG_PRINT(getKeyName(vk)); DEBUG_PRINT(" m_bOldKey="); DEBUG_PRINT(getKeyName(m_bOldKey)); DEBUG_PRINTLN("");
     bRes = View::g_pActiveView->onKeyDown(vk);
+    g_keyPad.onUserActivity(ulNow);
   }
   else if(vk != VK_NONE)
   {
@@ -185,9 +188,9 @@ bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
   else
   {
     m_ulToFireAutoRepeat = m_ulToFireLongKey = m_ulBounceSubsided = 0;
-    g_keyPad.m_ulToFireInactivity = ulNow + s_ulInactivityDelay;
     DEBUG_PRINT("onKeyUp vk="); DEBUG_PRINT(getKeyName(vk)); DEBUG_PRINT(" m_bOldKey="); DEBUG_PRINT(getKeyName(m_bOldKey)); DEBUG_PRINTLN("");
     bRes = View::g_pActiveView->onKeyUp(m_bOldKey);
+    g_keyPad.onUserActivity(ulNow);
   }
   m_bOldKey = vk;
   return bRes;
@@ -196,18 +199,16 @@ bool KeypadChannel::getAndDispatchKey(unsigned long ulNow)
 /**
  *  KeypadDuo class implementation 
  */
-KeypadDuo::KeypadDuo(uint8_t bPin1, uint8_t bPin2)
+KeypadDuo::KeypadDuo(uint8_t bPin1, uint8_t Keys1[], uint8_t uKeys1,
+                     uint8_t bPin2, uint8_t Keys2[], uint8_t uKeys2):
+  m_ulToFireInactivity(s_ulInactivityDelay)
 {
   m_ch[0].m_bPin = bPin1;
-  static uint8_t Keys1[] = {VK_RIGHT, VK_LEFT, VK_SEL /*, VK_SOFTA */};
   m_ch[0].m_vk = Keys1;
-  m_ch[0].m_uKeys = sizeof(Keys1)/sizeof(Keys1[0]);
-
-  static uint8_t Keys2[] = {VK_UP, VK_DOWN /*, VK_SOFTB*/};
-  
+  m_ch[0].m_uKeys = uKeys1;
   m_ch[1].m_bPin = bPin2;
   m_ch[1].m_vk = Keys2;
-  m_ch[1].m_uKeys = sizeof(Keys2)/sizeof(Keys2[0]);
+  m_ch[1].m_uKeys = uKeys2;
 }
 
 bool KeypadDuo::getAndDispatchKey(unsigned long now)
@@ -216,6 +217,12 @@ bool KeypadDuo::getAndDispatchKey(unsigned long now)
   if(i >= sizeof(m_ch)/sizeof(m_ch[0]))
     i = 0;
   return m_ch[i++].getAndDispatchKey(now);
+}
+
+bool KeypadDuo::onUserInActivity(unsigned long now)
+{
+  onUserActivity(now);
+  return View::g_pActiveView->onKeysInactive();
 }
 
 

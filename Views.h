@@ -8,9 +8,7 @@ class View
 protected:
   
 public:  
-  View() 
-  {    
-  }
+  View() {}
   
   /** The Active View */
   static View *g_pActiveView;
@@ -38,7 +36,10 @@ public:
   void DUMP(const char *szText = 0) {}
 #endif
 
-
+  void activate() 
+  {
+    g_pActiveView = this;
+  }
 };
 
 #endif

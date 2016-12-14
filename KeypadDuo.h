@@ -35,9 +35,6 @@ class KeypadChannel
   /** delay in ms before the long key is fired */
   static const int s_iLongKeyDelay = 2000;
 
-  /** inactivity timeout in milliseconds */
-  static const unsigned long s_ulInactivityDelay = 90000;
-
 public:
   KeypadChannel(){}
 
@@ -83,6 +80,9 @@ protected:
  */
 class KeypadDuo
 {
+  /** inactivity timeout in milliseconds */
+  static const unsigned long s_ulInactivityDelay = 10000;
+  
   /** to ensure that multiple keys can be read at the same time... */
   KeypadChannel m_ch[2];
 
@@ -92,7 +92,8 @@ public:
 
   
   /** keypad is connected to this analog input pin */
-  KeypadDuo(uint8_t bPin1, uint8_t bPin2);
+  KeypadDuo(uint8_t bPin1, uint8_t Keys1[], uint8_t uKeys1,
+            uint8_t bPin2, uint8_t Keys2[], uint8_t uKeys2);
 
   /**
    *  Call this from the main loop passing to it the result of millis();
@@ -103,7 +104,15 @@ public:
    *         pView->onKeyUp(uint8_t vk);
    *  Returns: true if key wasdispatched and processed (then screen redraw is needed!), false otherwise.
    */
-  bool getAndDispatchKey(unsigned long now);
+  bool getAndDispatchKey(unsigned long ulNow);
+
+  /** Delay inactivity notification */
+  void onUserActivity(unsigned long ulNow) 
+  {
+    m_ulToFireInactivity = ulNow + s_ulInactivityDelay;
+  }
+  /** act on user inactivity, reset counters */
+  bool onUserInActivity(unsigned long now);
 
 };
 
