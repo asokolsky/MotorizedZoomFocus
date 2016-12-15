@@ -25,6 +25,23 @@ public:
     return _acceleration;
   }
 
+  /**
+   *  startNow - a bracket to stopNow
+   */
+  void startNow(uint16_t uMaxSpeed)
+  {
+    enableOutputs();
+    setMaxSpeed(uMaxSpeed);
+  }
+  /**
+   *  Stop immediately.
+   */
+  void stopNow()
+  {
+    setCurrentPosition(currentPosition()); // this will also reset speed
+    disableOutputs();
+  }
+
 private:
 };
 

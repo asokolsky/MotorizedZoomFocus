@@ -30,8 +30,10 @@ typedef signed char schar_t;
 /**
  * Steppers constants and globals
  */
-const unsigned int iZoomSpeed = 200;
-const unsigned int iFocusSpeed = 200;
+const uint16_t uZoomSpeed = 200;
+const uint16_t uZoomMaxSpeed = 1000;
+const uint16_t uFocusSpeed = 200;
+const uint16_t uFocusMaxSpeed = 1000;
 
 extern Stepper g_stepperZoom;
 extern Stepper g_stepperFocus;

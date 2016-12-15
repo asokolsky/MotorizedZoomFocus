@@ -25,25 +25,25 @@ bool View::loop(unsigned long now)
 }
 
 
-/** dummy defaults, children to overwrite */
+/** 
+ *
+ */
 bool View::onKeyDown(uint8_t vk) 
 {
   bool bRes = false;
   if(vk & (VK_RIGHT|VK_LEFT))
   {
     DEBUG_PRINTLN("View::onKeyDown(VK_RIGHT|VK_LEFT)");
-    g_stepperFocus.setSpeed(iFocusSpeed);
+    g_stepperFocus.startNow(uFocusMaxSpeed);
     g_stepperFocus.move((vk & VK_RIGHT) ? 4000 : -4000);
-    //g_stepperFocus.setSpeed((vk & VK_RIGHT) ? iFocusSpeed : -iFocusSpeed);
     bRes = true;
     g_stepperFocus.DUMP("g_stepperFocus");
   }
   else if(vk & (VK_UP|VK_DOWN))
   {
     DEBUG_PRINTLN("View::onKeyDown(VK_UP|VK_DOWN)");
-    g_stepperZoom.setSpeed(iZoomSpeed);
+    g_stepperFocus.startNow(uZoomMaxSpeed);
     g_stepperZoom.move((vk & VK_UP) ? 4000 : -4000);
-    //g_stepperZoom.setSpeed((vk & VK_UP) ? iZoomSpeed : -iZoomSpeed);
     bRes = true;
     g_stepperZoom.DUMP("g_stepperZoom");
   }
@@ -54,6 +54,7 @@ bool View::onKeyDown(uint8_t vk)
   }
   return bRes;
 }
+
 bool View::onKeyAutoRepeat(uint8_t vk) 
 {
   /*
@@ -74,6 +75,7 @@ bool View::onKeyAutoRepeat(uint8_t vk)
   */
   return false;
 }
+
 bool View::onLongKeyDown(uint8_t vk) 
 {
   if(vk & (VK_RIGHT|VK_LEFT))
@@ -92,20 +94,21 @@ bool View::onLongKeyDown(uint8_t vk)
   }
   return false;
 }
+
 bool View::onKeyUp(uint8_t vk) 
 {
   bool bRes = false;
   if(vk & (VK_RIGHT|VK_LEFT))
   {
     DEBUG_PRINTLN("View::onKeyUp(VK_RIGHT|VK_LEFT)");
-    g_stepperFocus.setSpeed(0);
+    g_stepperFocus.stopNow(); // this will also reset speed
     bRes = true;
     g_stepperFocus.DUMP("g_stepperFocus");
   }
   if(vk & (VK_UP|VK_DOWN))
   {
     DEBUG_PRINTLN("View::onKeyUp(VK_UP|VK_DOWN)");
-    g_stepperZoom.setSpeed(0);
+    g_stepperZoom.stopNow(); // this will also reset speed
     bRes = true;
     g_stepperZoom.DUMP("g_stepperZoom");
   }
@@ -116,6 +119,7 @@ bool View::onKeyUp(uint8_t vk)
   }
   return bRes;
 }
+
 bool View::onKeysInactive()
 {
   DEBUG_PRINTLN("View::onKeysInactive() => true");
