@@ -1,0 +1,16 @@
+28BYJ-48 DataSheet
+
+    Unipolar stepper with 0.1" spaced 5-pin cable connector
+    513 steps per revolution
+    1/16.032 geared down reduction
+    5V DC suggested operation
+    Weight: 37 g.
+    Dimensions: 28mm diameter, 20mm tall not including 9mm shaft with 5mm diameter
+    9" / 23 cm long cable
+    Holding Torque: 150 gram-force*cm, 15 N*mm/ 2 oz-force*in
+    Shaft: 5mm diameter flattened
+    Approx 42 ohm DC impedence per winding
+
+More:
+https://www.adafruit.com/products/858
+
