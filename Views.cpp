@@ -122,9 +122,9 @@ bool View::onKeyUp(uint8_t vk)
 
 bool View::onKeysInactive()
 {
-  DEBUG_PRINTLN("View::onKeysInactive() => true");
+  /*DEBUG_PRINTLN("View::onKeysInactive() => true");
   g_stepperFocus.DUMP("g_stepperFocus");  
-  g_stepperZoom.DUMP("g_stepperZoom");
+  g_stepperZoom.DUMP("g_stepperZoom");*/
   return true;
 }
 
