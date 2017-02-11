@@ -1,0 +1,2 @@
+For schematics and PCB see
+https://easyeda.com/asokolsky/Motorized_Zoom_Focus-fd371d500baf4e3587b9946b5c422c9c
