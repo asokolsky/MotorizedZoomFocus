@@ -26,6 +26,7 @@ typedef signed char schar_t;
 #include "KeypadDuo.h"
 #include "Views.h"
 #include "Stepper.h"
+#include "PCB.h"
 
 /**
  * Steppers constants and globals

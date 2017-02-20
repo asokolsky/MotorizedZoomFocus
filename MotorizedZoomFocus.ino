@@ -26,18 +26,9 @@
 /**
  * Globals: reading battery voltage on A0 (through divider offcourse)
  */
-BatteryMonitor g_batteryMonitor(A0);
+BatteryMonitor g_batteryMonitor(pinBatteryMonitor);
 
-const uint8_t pinZoom1 = 2;
-const uint8_t pinZoom2 = 3;
-const uint8_t pinZoom3 = 4;
-const uint8_t pinZoom4 = 5;
 Stepper g_stepperZoom(pinZoom1, pinZoom3, pinZoom2, pinZoom4);
-
-const uint8_t pinFocus1 = 6;
-const uint8_t pinFocus2 = 7;
-const uint8_t pinFocus3 = 8;
-const uint8_t pinFocus4 = 9;
 Stepper g_stepperFocus(pinFocus1, pinFocus3, pinFocus2, pinFocus4);
 
 static View g_view;
@@ -51,7 +42,6 @@ void setup()
   DEBUG_PRINTLN("Zoom/Focus Rig!");
 
   g_batteryMonitor.update(millis());
-
   g_view.activate();
 }
 
