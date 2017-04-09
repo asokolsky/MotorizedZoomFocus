@@ -1,5 +1,5 @@
 #include "MotorizedZoomFocus.h"
-#include "Stepper.h"
+//#include "Stepper.h"
 
 Stepper::Stepper(uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4) :
   AccelStepper(AccelStepper::HALF4WIRE, pin1, pin2, pin3, pin4)
@@ -12,7 +12,7 @@ Stepper::Stepper(uint8_t pin1, uint8_t pin2, uint8_t pin3, uint8_t pin4) :
 void Stepper::DUMP(const char *szText /*= 0*/) const
 {
   if(szText != 0) {
-    DEBUG_PRINT(szText);
+    DEBUG_PRNT(szText);
   }
   DEBUG_PRINT(" Stepper@"); DEBUG_PRINTDEC((int)this); 
   

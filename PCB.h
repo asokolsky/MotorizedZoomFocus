@@ -2,6 +2,10 @@
 /** Battery Monitor*/
 const uint8_t pinBatteryMonitor = A0;
 
+/** KeyPad connection */
+const uint8_t pinKeyPad1 = A1;
+const uint8_t pinKeyPad2 = A2;
+
 /** LANC port connection */
 const uint8_t pinLancOut = 12; // inverted
 const uint8_t pinLancIn  = 13;

@@ -1,5 +1,4 @@
-#include <Arduino.h>
-#include "Trace.h"
+#include "MotorizedZoomFocus.h"
 #include "BatteryMonitor.h"
 
 BatteryMonitor::BatteryMonitor(uint8_t pin) : m_pin(pin), m_gauge(0), m_ulNextUpdate(0)
