@@ -54,12 +54,12 @@ public:
 bool MyNavKeyPad::onUserInActivity(unsigned long ulNow)
 {
   DEBUG_PRINT("MyNavKeyPad::onUserInActivity ulNow="); DEBUG_PRINTDEC(ulNow); DEBUG_PRINTLN("");
-  return false; 
+  return g_batteryMonitor.updateMaybe(ulNow);
 }
 
 bool MyNavKeyPad::onKeyAutoRepeat(uint8_t vks)
 {
-  DEBUG_PRINT("MyNavKeyPad::onKeyAutoRepeat vks="); DEBUG_PRNTLN(getKeyNames(vks));
+  //DEBUG_PRINT("MyNavKeyPad::onKeyAutoRepeat vks="); DEBUG_PRNTLN(getKeyNames(vks));
   return false; 
 }
 
@@ -224,49 +224,21 @@ void setup()
 
 void loop()
 {  
-  unsigned long now = millis();
-
-  bool bUpdateDisplay = false;
-  {
-    bool bRes1 = g_stepperZoom.run(); // runSpeed();
-    bool bRes2 = g_stepperFocus.run(); // runSpeed();
-    //DEBUG_PRINT("View::loop(), bRes1="); DEBUG_PRINTDEC(bRes1);
-    //DEBUG_PRINT(" bRes2="); DEBUG_PRINTDEC(bRes2);
-    //DEBUG_PRINTLN("");
-    
-    bUpdateDisplay = (bRes1 || bRes2);
-  }
-
-  if(g_keyPad.getAndDispatchKey(now))
-  {
-    bUpdateDisplay = true;
-  } 
-  /*else if(g_serialCommandInterpreter.available()) 
-  {
-    DEBUG_PRINTLN("Read a command from serial line!");
-    g_serialCommandInterpreter.readAndDispatch();
-    bUpdateDisplay = true;
-  } */
-  else if(g_batteryMonitor.updateMaybe(now))
-  {    
-    bUpdateDisplay = true;
-  }
-  //if(bUpdateDisplay) g_ci.updateDisplay(now);
-  //if(bUpdateDisplay && View::g_pActiveView != 0) View::g_pActiveView->update(now);
-
+  bool bRes1 = g_stepperZoom.run(); // runSpeed();
+  bool bRes2 = g_stepperFocus.run(); // runSpeed();
+  //DEBUG_PRINT("View::loop(), bRes1="); DEBUG_PRINTDEC(bRes1); DEBUG_PRINT(" bRes2="); DEBUG_PRINTDEC(bRes2); DEBUG_PRINTLN("");    
+  //unsigned long now = millis();
+  g_keyPad.getAndDispatchKey(millis());
+  if(bRes1 || bRes2)
+    return;
   // 
   // update the display
   //
-  /*
-  g_u8g2.clearBuffer();                 // clear the internal memory
-  g_u8g2.sendBuffer();                  // transfer internal memory to the display
-*/
   g_u8g2.firstPage();
   do {
     drawTitleBar();
     drawScreen();
   } while(g_u8g2.nextPage());
-
 }
 
 
